@@ -1,7 +1,7 @@
 <div class="grid-container">
   <div class="grid-header">
-    <span>Files</span>
-    <button (click)="selectAll()">Select all</button>
+    <span class="title">Files</span>
+    <button class="select-btn" (click)="selectAll()">Select all</button>
   </div>
   <div class="grid-content">
     <div class="grid">
@@ -16,7 +16,7 @@
           [class.checked]="isSelected(file)"
           (click)="toggleSelect($event, file)"
         >
-          <span *ngIf="isSelected(file)">✓</span>
+          <span *ngIf="isSelected(file)" class="check">✓</span>
         </div>
         <div class="file-icon">
           <span *ngIf="file.type === 'folder'">📁</span>

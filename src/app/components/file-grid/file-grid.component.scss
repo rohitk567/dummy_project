@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
 }
+
 .grid-header {
   display: flex;
   justify-content: space-between;
@@ -10,22 +11,32 @@
   padding: 10px 16px;
   border-bottom: 1px solid #e0e0e0;
 }
-button {
+
+.title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.select-btn {
   background: transparent;
   border: none;
   color: #00a2ae;
   cursor: pointer;
+  font-weight: 500;
 }
+
 .grid-content {
   flex: 1;
   padding: 20px;
   overflow: auto;
 }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 20px;
 }
+
 .grid-item {
   position: relative;
   display: flex;
@@ -37,13 +48,17 @@ button {
   background: white;
   cursor: pointer;
 }
+
 .grid-item:hover {
   border-color: #91d5ff;
+  box-shadow: 0 0 8px rgba(0, 162, 174, 0.2);
 }
+
 .grid-item.selected {
   border-color: #00a2ae;
   background-color: #f0fdff;
 }
+
 .selection-circle {
   position: absolute;
   top: 8px;
@@ -56,15 +71,18 @@ button {
   align-items: center;
   justify-content: center;
 }
+
 .selection-circle.checked {
   background-color: #00a2ae;
   border-color: #00a2ae;
   color: white;
 }
+
 .file-icon {
   font-size: 40px;
   margin-bottom: 12px;
 }
+
 .file-name {
   text-align: center;
   overflow: hidden;

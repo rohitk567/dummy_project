@@ -35,6 +35,8 @@ export class FileGridComponent {
 
   toggleSelect(event: Event, file: FileItem) {
     event.stopPropagation();
+    console.log('Toggle select for file:', file.name);
+
     if (this.selectedFiles.has(file.path)) {
       this.selectedFiles.delete(file.path);
     } else {
@@ -43,9 +45,13 @@ export class FileGridComponent {
   }
 
   selectAll() {
+    console.log('Select all clicked');
+
     if (this.selectedFiles.size === this.files.length) {
+      // Deselect all
       this.selectedFiles.clear();
     } else {
+      // Select all
       this.selectedFiles.clear();
       this.files.forEach((file) => this.selectedFiles.add(file.path));
     }
