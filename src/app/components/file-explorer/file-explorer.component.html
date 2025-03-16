@@ -9,7 +9,7 @@
           <div
             class="file-explorer__tree-item"
             [class.file-explorer__tree-item--selected]="
-              node.path === selectedPath
+              selectedNode?.path === node.path
             "
             [style.padding-left.px]="node.level * 20 + 10"
             (click)="selectNode(node)"

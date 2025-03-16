@@ -9,6 +9,7 @@ export class FileExplorerService {
   private filesSubject = new BehaviorSubject<FileItem[]>([]);
   private selectedPathSubject = new BehaviorSubject<string>('Root');
   private treeNodesSubject = new BehaviorSubject<TreeNode[]>([]);
+  private selectedNodeSubject = new BehaviorSubject<TreeNode | null>(null);
 
   // Define proper type for file system data
   private fileSystemData: Record<string, any> = {
@@ -53,6 +54,11 @@ export class FileExplorerService {
 
     // Set initial files
     this.updateFileList('Root');
+
+    // Set initial selected node
+    if (treeNodes.length > 0) {
+      this.selectedNodeSubject.next(treeNodes[0]);
+    }
   }
 
   private buildTreeNodes(): TreeNode[] {
@@ -141,6 +147,10 @@ export class FileExplorerService {
     return this.treeNodesSubject.asObservable();
   }
 
+  getSelectedNode(): Observable<TreeNode | null> {
+    return this.selectedNodeSubject.asObservable();
+  }
+
   getFiles(): Observable<FileItem[]> {
     return this.filesSubject.asObservable();
   }
@@ -149,9 +159,24 @@ export class FileExplorerService {
     return this.selectedPathSubject.asObservable();
   }
 
-  setSelectedPath(path: string): void {
+  setSelectedPath(path: string, node?: TreeNode): void {
     this.selectedPathSubject.next(path);
-    this.updateFileList(path);
+
+    if (node) {
+      this.selectedNodeSubject.next(node);
+    }
+
+    // If this is a folder, update file list
+    if (!node || node.isFolder) {
+      this.updateFileList(path);
+    } else {
+      // If this is a file, update file list for parent folder
+      const lastSlashIndex = path.lastIndexOf('/');
+      if (lastSlashIndex !== -1) {
+        const parentPath = path.substring(0, lastSlashIndex);
+        this.updateFileList(parentPath);
+      }
+    }
   }
 
   toggleNodeExpanded(node: TreeNode): void {
@@ -159,14 +184,25 @@ export class FileExplorerService {
     this.treeNodesSubject.next([...this.treeNodesSubject.value]);
   }
 
+  getParentPath(path: string): string {
+    const lastSlashIndex = path.lastIndexOf('/');
+    if (lastSlashIndex !== -1) {
+      return path.substring(0, lastSlashIndex);
+    }
+    return path;
+  }
+
   private updateFileList(path: string): void {
-    const pathSegments = path.split('/');
-    // Start with root data object
+    // Split path into segments
+    const pathSegments = path
+      .split('/')
+      .filter((segment) => segment.length > 0);
+
+    // Start at root level
     let currentData: Record<string, any> = this.fileSystemData;
 
     // Navigate to the current folder
-    for (let i = 0; i < pathSegments.length; i++) {
-      const segment = pathSegments[i];
+    for (const segment of pathSegments) {
       if (
         currentData &&
         typeof currentData === 'object' &&
@@ -182,7 +218,12 @@ export class FileExplorerService {
     const files: FileItem[] = [];
 
     // Process current folder contents
-    if (currentData && typeof currentData === 'object') {
+    if (
+      currentData &&
+      typeof currentData === 'object' &&
+      !Array.isArray(currentData)
+    ) {
+      // It's an object with potential subfolders/files
       for (const key in currentData) {
         const value = currentData[key];
 
@@ -209,8 +250,45 @@ export class FileExplorerService {
           });
         }
       }
+    } else if (Array.isArray(currentData)) {
+      // It's an array of filenames
+      currentData.forEach((fileName) => {
+        files.push({
+          name: fileName,
+          type: 'file',
+          path: `${path}/${fileName}`,
+        });
+      });
     }
 
     this.filesSubject.next(files);
+  }
+
+  // Helper method to find a node by path
+  findNodeByPath(path: string): TreeNode | null {
+    // Recursive helper function
+    const findNode = (
+      nodes: TreeNode[] | undefined,
+      searchPath: string
+    ): TreeNode | null => {
+      if (!nodes) return null;
+
+      for (const node of nodes) {
+        if (node.path === searchPath) {
+          return node;
+        }
+
+        if (node.children) {
+          const foundInChildren = findNode(node.children, searchPath);
+          if (foundInChildren) {
+            return foundInChildren;
+          }
+        }
+      }
+
+      return null;
+    };
+
+    return findNode(this.treeNodesSubject.value, path);
   }
 }

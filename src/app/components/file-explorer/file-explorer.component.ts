@@ -13,6 +13,7 @@ import { FileItem, TreeNode } from '../../models/file-explorer.model';
 export class FileExplorerComponent implements OnInit {
   files: FileItem[] = [];
   selectedPath = 'Root';
+  selectedNode: TreeNode | null = null;
   selectedFiles = new Set<string>();
   treeNodes: TreeNode[] = [];
   flattenedTreeNodes: TreeNode[] = [];
@@ -35,6 +36,11 @@ export class FileExplorerComponent implements OnInit {
     this.fileExplorerService.getSelectedPath().subscribe((path) => {
       this.selectedPath = path;
     });
+
+    // Get selected node
+    this.fileExplorerService.getSelectedNode().subscribe((node) => {
+      this.selectedNode = node;
+    });
   }
 
   updateFlattenedNodes() {
@@ -55,7 +61,7 @@ export class FileExplorerComponent implements OnInit {
   }
 
   selectNode(node: TreeNode) {
-    this.fileExplorerService.setSelectedPath(node.path);
+    this.fileExplorerService.setSelectedPath(node.path, node);
   }
 
   toggleNode(event: Event, node: TreeNode) {
@@ -70,7 +76,25 @@ export class FileExplorerComponent implements OnInit {
 
   onFileClick(file: FileItem) {
     if (file.type === 'folder') {
-      this.fileExplorerService.setSelectedPath(file.path);
+      // Find node in tree
+      const node = this.fileExplorerService.findNodeByPath(file.path);
+      if (node) {
+        // If folder is found in tree, select it and ensure it's expanded
+        if (!node.isExpanded) {
+          node.isExpanded = true;
+          this.updateFlattenedNodes();
+        }
+        this.fileExplorerService.setSelectedPath(file.path, node);
+      } else {
+        // Fallback if node is not found
+        this.fileExplorerService.setSelectedPath(file.path);
+      }
+    } else {
+      // For files, find the corresponding node in the tree
+      const node = this.fileExplorerService.findNodeByPath(file.path);
+      if (node) {
+        this.fileExplorerService.setSelectedPath(file.path, node);
+      }
     }
   }
 
