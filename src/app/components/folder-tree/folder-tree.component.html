@@ -1,0 +1,49 @@
+<div class="tree-container">
+  <div class="tree-header">
+    <span>Folder 1</span>
+  </div>
+  <div class="tree-content">
+    <div
+      class="tree-item"
+      [class.selected]="selectedPath === 'Root/Folder1'"
+      (click)="selectFolder('Root/Folder1')"
+    >
+      <span>Folder 002</span>
+    </div>
+    <div
+      class="tree-item"
+      [class.selected]="selectedPath === 'Root/Folder2'"
+      (click)="selectFolder('Root/Folder2')"
+    >
+      <span>Folder 003</span>
+    </div>
+    <div
+      class="tree-item"
+      [class.selected]="selectedPath === 'Root/Folder3'"
+      (click)="selectFolder('Root/Folder3')"
+    >
+      <span>Folder 004</span>
+    </div>
+    <div
+      class="tree-item"
+      [class.selected]="selectedPath === 'Root/Folder4'"
+      (click)="selectFolder('Root/Folder4')"
+    >
+      <span>Folder 2</span>
+    </div>
+    <div
+      class="tree-item"
+      [class.selected]="selectedPath === 'Root/Folder5'"
+      (click)="selectFolder('Root/Folder5')"
+    >
+      <span>Folder 3</span>
+    </div>
+    <div
+      class="tree-item"
+      [class.selected]="selectedPath === 'Root/Folder6'"
+      (click)="selectFolder('Root/Folder6')"
+    >
+      <span>Folder 4</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<div class="grid-container">
+  <div class="grid-header">
+    <span>Files</span>
+    <button (click)="selectAll()">Select all</button>
+  </div>
+  <div class="grid-content">
+    <div class="grid">
+      <div
+        *ngFor="let file of files"
+        class="grid-item"
+        [class.selected]="isSelected(file)"
+        (click)="onFileClick(file)"
+      >
+        <div
+          class="selection-circle"
+          [class.checked]="isSelected(file)"
+          (click)="toggleSelect($event, file)"
+        >
+          <span *ngIf="isSelected(file)">✓</span>
+        </div>
+        <div class="file-icon">
+          <span *ngIf="file.type === 'folder'">📁</span>
+          <span *ngIf="file.type === 'file'">📄</span>
+        </div>
+        <div class="file-name">{{ file.name }}</div>
+      </div>
+    </div>
+  </div>
+</div>
