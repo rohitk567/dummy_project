@@ -1,8 +1,69 @@
 <div class="file-explorer">
-  <div class="sidebar">
-    <app-folder-tree></app-folder-tree>
+  <!-- Left Side - Tree View -->
+  <div class="file-explorer__sidebar">
+    <div class="file-explorer__tree-header">Root</div>
+    <div class="file-explorer__tree-content">
+      <div class="file-explorer__tree-items">
+        <!-- Recursively render tree nodes -->
+        <ng-container *ngFor="let node of flattenedTreeNodes">
+          <div
+            class="file-explorer__tree-item"
+            [class.file-explorer__tree-item--selected]="
+              node.path === selectedPath
+            "
+            [style.padding-left.px]="node.level * 20 + 10"
+            (click)="selectNode(node)"
+          >
+            <!-- Expand/Collapse icon for folders only -->
+            <span
+              *ngIf="node.isFolder && (node.children?.length ?? 0) > 0"
+              class="file-explorer__tree-toggle"
+              (click)="toggleNode($event, node)"
+            >
+              {{ node.isExpanded ? "▼" : "▶" }}
+            </span>
+            <!-- Empty space for files and empty folders -->
+            <span
+              *ngIf="!node.isFolder || (node.children?.length ?? 0) === 0"
+              class="file-explorer__tree-toggle-placeholder"
+            ></span>
+            <span class="file-explorer__tree-name">{{ node.name }}</span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
   </div>
-  <div class="content">
-    <app-file-grid></app-file-grid>
+
+  <!-- Right Side - File Grid -->
+  <div class="file-explorer__content">
+    <div class="file-explorer__grid-header">
+      <span class="file-explorer__title">Files</span>
+      <button class="file-explorer__select-btn" (click)="selectAll()">
+        Select all
+      </button>
+    </div>
+    <div class="file-explorer__grid-content">
+      <div class="file-explorer__grid">
+        <div
+          *ngFor="let file of files"
+          class="file-explorer__grid-item"
+          [class.file-explorer__grid-item--selected]="isSelected(file)"
+          (click)="onFileClick(file)"
+        >
+          <div
+            class="file-explorer__selection-circle"
+            [class.file-explorer__selection-circle--checked]="isSelected(file)"
+            (click)="toggleSelect($event, file)"
+          >
+            <span *ngIf="isSelected(file)" class="file-explorer__check">✓</span>
+          </div>
+          <div class="file-explorer__file-icon">
+            <span *ngIf="file.type === 'folder'">📁</span>
+            <span *ngIf="file.type === 'file'">📄</span>
+          </div>
+          <div class="file-explorer__file-name">{{ file.name }}</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
